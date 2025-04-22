@@ -14,7 +14,7 @@ A Bash-based monitoring script that automates the process of listing AWS resourc
 
 ---
 
-## 🛠️ Prerequisites
+## Prerequisites
 
 - AWS CLI installed and configured  
   → [Install AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
