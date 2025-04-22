@@ -1,16 +1,17 @@
 # AWS Resource Monitor Dashboard
 
-A Bash-based monitoring script that automates the process of listing AWS resources across EC2, S3, RDS, and Lambda. The script supports cron scheduling for daily reports, checks for AWS CLI configuration, and generates a formatted summary of resources per region.
+A Bash-based monitoring script that automates the process of listing AWS resources across EC2, S3, RDS, and Lambda. The script verifies AWS CLI configuration, supports cron scheduling for daily reports, and automatically sends the report via email for easy access.
 
 ---
 
 ## Features
 
 - Lists EC2 instances, S3 buckets, RDS instances, and Lambda functions.
-- Supports AWS region configuration.
 - Verifies AWS CLI installation and credentials before running.
-- Generates daily reports in a readable `.txt` format.
-- Can be scheduled with `cron` for automation.
+- Supports AWS region configuration.
+- Generates readable `.txt` reports.
+- Sends the report via email using `msmtp` and `mailutils`.
+- Supports cron scheduling for daily automation.
 
 ---
 
@@ -24,7 +25,50 @@ aws configure
 ```
 
 - Bash shell (Ubuntu/Linux environment)
-- Access to AWS EC2, S3, RDS, Lambda services
+- Access to AWS EC2, S3, RDS, and Lambda services
+- `msmtp` and `mailutils` installed for email support:
+
+```bash
+sudo apt install msmtp msmtp-mta mailutils -y
+```
+
+- Gmail App Password (recommended for SMTP auth)  
+  → [Generate App Password](https://myaccount.google.com/apppasswords)
+
+---
+
+## Email Configuration
+
+Create a `.msmtprc` file in your home directory:
+
+```bash
+nano ~/.msmtprc
+```
+
+Example config:
+
+```ini
+defaults
+auth on
+tls on
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+logfile ~/.msmtp.log
+
+account gmail
+host smtp.gmail.com
+port 587
+from your-email@gmail.com
+user your-email@gmail.com
+password your-app-password
+
+account default : gmail
+```
+
+Secure the file:
+
+```bash
+chmod 600 ~/.msmtprc
+```
 
 ---
 
@@ -76,8 +120,8 @@ aws-monitor-report-2025-04-21_07-00.txt
 Region: us-east-2
 
 >>> EC2 Instances:
-| Instance ID | Instance Type | State  | Public IP |
-|-------------|----------------|--------|-----------|
+| Instance ID        | Instance Type | State   | Public IP        |
+|--------------------|---------------|---------|------------------|
 
 >>> S3 Buckets:
 2025-01-01  bucket-name-1
@@ -86,10 +130,14 @@ Region: us-east-2
 ...
 ```
 
+The content of this report will be sent to your configured email address.
+
 ---
 
 ## Contributing
+
 Contributions are welcome! Feel free to fork the repository, submit issues, and create pull requests.
 
 ## Author
+
 - **Pasindu Waidyarathna**
