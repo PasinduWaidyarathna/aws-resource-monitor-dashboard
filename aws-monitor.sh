@@ -5,6 +5,8 @@ DATE=$(date '+%Y-%m-%d_%H-%M')
 REGION="us-east-2"
 REPORT_FILE="$HOME/aws-monitor-report-$DATE.txt"
 SERVICES=("ec2" "s3" "rds" "lambda")
+EMAIL_TO="kvpasindumalinda@gmail.com"
+EMAIL_SUBJECT="AWS Resource Monitor Report - $DATE"
 # ====================
 
 # Check AWS CLI
@@ -21,6 +23,7 @@ then
     exit 1
 fi
 
+# Start Report
 echo "=== AWS Resource Monitor Report ($DATE) ===" > "$REPORT_FILE"
 echo "Region: $REGION" >> "$REPORT_FILE"
 echo "" >> "$REPORT_FILE"
@@ -63,5 +66,13 @@ if [[ " ${SERVICES[@]} " =~ " lambda " ]]; then
     echo "" >> "$REPORT_FILE"
 fi
 
-echo ">>> Report generated at: $REPORT_FILE"
+echo ">>> Report generated at: $REPORT_FILE" >> "$REPORT_FILE"
+echo "" >> "$REPORT_FILE"
 
+# ====== Send Email ======
+if command -v mail &> /dev/null; then
+    cat "$REPORT_FILE" | mail -s "$EMAIL_SUBJECT" "$EMAIL_TO"
+    echo ">>> Email sent to $EMAIL_TO"
+else
+    echo "[ERROR] 'mail' command not found. Please install 'mailutils' and configure msmtp."
+fi
